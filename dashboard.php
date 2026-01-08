@@ -78,7 +78,7 @@ if (isset($_GET['logout'])) {
                     </li>
                     
                     <li class="nav-item">
-                        <a href="?logout=1" class="nav-link">Logout</a>
+                        <a href="login.php" class="nav-link">Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -122,7 +122,7 @@ if (isset($_GET['logout'])) {
             <div class="recent-bugs">
                 <div class="section-header">
                     <h2 class="section-title">Recent Bugs</h2>
-                    <select class="filter-dropdown" onchange="window.location.href='?filter=' + this.value">
+                    <select class="filter-dropdown" onchange="window.location.href='dashboard.php?filter=' + this.value">
                         <option value="all" <?php echo $filter === 'all' ? 'selected' : ''; ?>>Filter: All tickets ↓</option>
                         <option value="my_tickets" <?php echo $filter === 'my_tickets' ? 'selected' : ''; ?>>My Tickets</option>
                         <option value="front-end" <?php echo $filter === 'front-end' ? 'selected' : ''; ?>>Category: Front-end</option>

@@ -110,7 +110,7 @@ if (isset($_GET['logout'])) {
                         <a href="new_ticket.php" class="nav-link active">New Ticket</a>
                     </li>
                     <li class="nav-item">
-                        <a href="?logout=1" class="nav-link">Logout</a>
+                        <a href="login.php" class="nav-link">Logout</a>
                     </li>
                 </ul>
             </nav>

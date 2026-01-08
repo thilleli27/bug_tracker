@@ -2,11 +2,7 @@
 session_start();
 require_once 'config/database.php';
 
-// Si l'utilisateur est déjà connecté, rediriger vers le dashboard
-if (isLoggedIn()) {
-    header('Location: dashboard.php');
-    exit;
-}
+
 
 $errors = [];
 $success = false;
