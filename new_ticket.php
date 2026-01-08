@@ -372,9 +372,7 @@ if (isset($_GET['logout'])) {
                     <li class="nav-item">
                         <a href="dashboard.php" class="nav-link">Dashboard</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="tickets.php" class="nav-link">All Tickets</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a href="new_ticket.php" class="nav-link active">New Ticket</a>
                     </li>

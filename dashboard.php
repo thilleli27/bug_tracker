@@ -52,7 +52,7 @@ if (isset($_GET['logout'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -375,7 +375,7 @@ if (isset($_GET['logout'])) {
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-dashboard: 1000;
             left: 0;
             top: 0;
             width: 100%;
@@ -442,6 +442,39 @@ if (isset($_GET['logout'])) {
         .btn-cancel:hover {
             background: rgba(203, 213, 224, 0.3);
         }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-dashboard: 2000;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background: #48bb78;
+        }
+
+        .notification.error {
+            background: #f56565;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
         
         @media (max-width: 1200px) {
             .stats-grid {
@@ -471,6 +504,9 @@ if (isset($_GET['logout'])) {
     </style>
 </head>
 <body>
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -482,11 +518,9 @@ if (isset($_GET['logout'])) {
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="index.php" class="nav-link active">Dashboard</a>
+                        <a href="dashboard.php" class="nav-link active">Dashboard</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="tickets.php" class="nav-link">All Tickets</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a href="?logout=1" class="nav-link">Logout</a>
                     </li>
@@ -509,22 +543,22 @@ if (isset($_GET['logout'])) {
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Total Bugs</div>
-                    <div class="stat-value"><?php echo $stats['total_tickets']; ?></div>
+                    <div class="stat-value" id="stat-total"><?php echo $stats['total_tickets']; ?></div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-label">Open</div>
-                    <div class="stat-value"><?php echo $stats['open_tickets']; ?></div>
+                    <div class="stat-value" id="stat-open"><?php echo $stats['open_tickets']; ?></div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-label">In Progress</div>
-                    <div class="stat-value"><?php echo $stats['in_progress_tickets']; ?></div>
+                    <div class="stat-value" id="stat-progress"><?php echo $stats['in_progress_tickets']; ?></div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-label">Resolved</div>
-                    <div class="stat-value"><?php echo $stats['closed_tickets']; ?></div>
+                    <div class="stat-value" id="stat-closed"><?php echo $stats['closed_tickets']; ?></div>
                 </div>
             </div>
             
@@ -533,11 +567,11 @@ if (isset($_GET['logout'])) {
                 <div class="section-header">
                     <h2 class="section-title">Recent Bugs</h2>
                     <select class="filter-dropdown" onchange="window.location.href='?filter=' + this.value">
-                        <option value="all" <?php echo $filter === 'all' ? 'selected' : ''; ?>>Filter : All tickets ↓</option>
-                        <option value="my_tickets" <?php echo $filter === 'my_tickets' ? 'selected' : ''; ?>>Mes Tickets</option>
-                        <option value="front-end" <?php echo $filter === 'front-end' ? 'selected' : ''; ?>>Catégorie Front-end</option>
-                        <option value="back-end" <?php echo $filter === 'back-end' ? 'selected' : ''; ?>>Catégorie Back-end</option>
-                        <option value="infrastructure" <?php echo $filter === 'infrastructure' ? 'selected' : ''; ?>>Catégorie Infrastructure</option>
+                        <option value="all" <?php echo $filter === 'all' ? 'selected' : ''; ?>>Filter: All tickets ↓</option>
+                        <option value="my_tickets" <?php echo $filter === 'my_tickets' ? 'selected' : ''; ?>>My Tickets</option>
+                        <option value="front-end" <?php echo $filter === 'front-end' ? 'selected' : ''; ?>>Category: Front-end</option>
+                        <option value="back-end" <?php echo $filter === 'back-end' ? 'selected' : ''; ?>>Category: Back-end</option>
+                        <option value="infrastructure" <?php echo $filter === 'infrastructure' ? 'selected' : ''; ?>>Category: Infrastructure</option>
                     </select>
                 </div>
                 
@@ -558,9 +592,9 @@ if (isset($_GET['logout'])) {
                                 <th>ACTIONS</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tickets-tbody">
                             <?php foreach ($tickets as $ticket): ?>
-                            <tr>
+                            <tr data-ticket-id="<?php echo $ticket['id']; ?>">
                                 <td class="bug-id">#<?php echo $ticket['id']; ?></td>
                                 <td><?php echo htmlspecialchars($ticket['title']); ?></td>
                                 <td><?php echo htmlspecialchars($ticket['category_name']); ?></td>
@@ -586,7 +620,7 @@ if (isset($_GET['logout'])) {
                                     </span>
                                 </td>
                                 <td><?php echo $ticket['assigned_name'] ? htmlspecialchars($ticket['assigned_name']) : '-'; ?></td>
-                                <td><?php echo $ticket['resolved_at'] ? date('d/m/Y H:i', strtotime($ticket['resolved_at'])) : '-'; ?></td>
+                                <td class="resolved-at"><?php echo $ticket['resolved_at'] ? date('d/m/Y H:i', strtotime($ticket['resolved_at'])) : '-'; ?></td>
                                 <td class="actions">
                                     <button class="action-btn" title="Edit" onclick="window.location.href='new_ticket.php?id=<?php echo $ticket['id']; ?>'">🖊️</button>
                                     <button class="action-btn" title="Delete" onclick="confirmDelete(<?php echo $ticket['id']; ?>)">🗑️</button>
@@ -599,12 +633,12 @@ if (isset($_GET['logout'])) {
                 <?php else: ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">🐛</div>
-                    <div class="empty-state-title">Aucun ticket trouvé</div>
+                    <div class="empty-state-title">No tickets found</div>
                     <div class="empty-state-text">
                         <?php if ($filter === 'my_tickets'): ?>
-                            Vous n'avez créé ou assigné aucun ticket pour le moment.
+                            You haven't created or been assigned any tickets yet.
                         <?php else: ?>
-                            Aucun ticket ne correspond à ce filtre. Créez-en un nouveau !
+                            No tickets match this filter. Create a new one!
                         <?php endif; ?>
                     </div>
                 </div>
@@ -613,14 +647,14 @@ if (isset($_GET['logout'])) {
         </main>
     </div>
     
-    <!-- Modal de confirmation de suppression -->
+    <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">⚠️ Confirmer la suppression</h2>
-            <p class="modal-text">Êtes-vous sûr de vouloir supprimer ce ticket ? Cette action est irréversible.</p>
+            <h2 class="modal-title">⚠️ Confirm Deletion</h2>
+            <p class="modal-text">Are you sure you want to delete this ticket? This action cannot be undone.</p>
             <div class="modal-actions">
-                <button class="btn btn-danger" onclick="deleteTicket()">Supprimer</button>
-                <button class="btn btn-cancel" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-danger" onclick="deleteTicket()">Delete</button>
+                <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -628,53 +662,132 @@ if (isset($_GET['logout'])) {
     <script>
         let ticketToDelete = null;
         
+        // Fonction pour afficher une notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Fonction pour mettre à jour les statistiques
+        function updateStats() {
+            fetch('actions.php?get_stats=1')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('stat-total').textContent = data.stats.total_tickets;
+                        document.getElementById('stat-open').textContent = data.stats.open_tickets;
+                        document.getElementById('stat-progress').textContent = data.stats.in_progress_tickets;
+                        document.getElementById('stat-closed').textContent = data.stats.closed_tickets;
+                    }
+                })
+                .catch(error => console.error('Erreur lors de la mise à jour des stats:', error));
+        }
+        
+        // Fonction pour mettre à jour le statut
         function updateStatus(ticketId, newStatus) {
-            fetch('index.php', {
+            const formData = new FormData();
+            formData.append('update_status', '1');
+            formData.append('ticket_id', ticketId);
+            formData.append('status', newStatus);
+            
+            fetch('actions.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `update_status=1&ticket_id=${ticketId}&status=${encodeURIComponent(newStatus)}`
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    showNotification('Status updated successfully!', 'success');
+                    
+                    // Mettre à jour resolved_at dans l'interface
+                    const row = document.querySelector(`tr[data-ticket-id="${ticketId}"]`);
+                    const resolvedAtCell = row.querySelector('.resolved-at');
+                    
+                    if (newStatus === 'Closed') {
+                        const now = new Date();
+                        const formatted = now.toLocaleDateString('fr-FR') + ' ' + 
+                                        now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                        resolvedAtCell.textContent = formatted;
+                    } else {
+                        resolvedAtCell.textContent = '-';
+                    }
+                    
+                    // Mettre à jour les statistiques
+                    updateStats();
+                } else {
+                    showNotification('Error updating status: ' + (data.error || 'Unknown error'), 'error');
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Connection error', 'error');
+            });
         }
         
+        // Fonction pour confirmer la suppression
         function confirmDelete(ticketId) {
             ticketToDelete = ticketId;
             document.getElementById('deleteModal').classList.add('active');
         }
         
+        // Fonction pour fermer le modal
         function closeModal() {
             document.getElementById('deleteModal').classList.remove('active');
             ticketToDelete = null;
         }
         
+        // Fonction pour supprimer le ticket
         function deleteTicket() {
             if (ticketToDelete) {
-                fetch('index.php', {
+                const formData = new FormData();
+                formData.append('delete_ticket', '1');
+                formData.append('ticket_id', ticketToDelete);
+                
+                fetch('actions.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `delete_ticket=1&ticket_id=${ticketToDelete}`
+                    body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        showNotification('Ticket deleted successfully!', 'success');
+                        
+                        // Supprimer la ligne du tableau
+                        const row = document.querySelector(`tr[data-ticket-id="${ticketToDelete}"]`);
+                        if (row) {
+                            row.remove();
+                        }
+                        
+                        // Mettre à jour les statistiques
+                        updateStats();
+                        
+                        closeModal();
+                        
+                        // Vérifier s'il reste des tickets
+                        const tbody = document.getElementById('tickets-tbody');
+                        if (tbody && tbody.children.length === 0) {
+                            location.reload();
+                        }
+                    } else {
+                        showNotification('Error deleting ticket: ' + (data.error || 'Unknown error'), 'error');
+                        closeModal();
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Connection error', 'error');
+                    closeModal();
+                });
             }
         }
         
-        // Fermer le modal en cliquant en dehors
+        // Fermer le modal en cliquant à l'extérieur
         window.onclick = function(event) {
             const modal = document.getElementById('deleteModal');
             if (event.target === modal) {

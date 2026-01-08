@@ -59,18 +59,27 @@ function logout() {
     exit;
 }
 
-// Fonction pour obtenir les statistiques des tickets
+// Récupérer les statistiques des tickets
 function getTicketStats($pdo) {
-    $stmt = $pdo->query("
-        SELECT 
-            COUNT(*) as total_tickets,
-            SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) as open_tickets,
-            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress_tickets,
-            SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed_tickets,
-            SUM(CASE WHEN priority = 'Critical' THEN 1 ELSE 0 END) as critical_tickets
-        FROM tickets
-    ");
-    return $stmt->fetch();
+    $stats = [];
+    
+    // Total des tickets
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM tickets");
+    $stats['total_tickets'] = $stmt->fetch()['count'];
+    
+    // Tickets ouverts
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM tickets WHERE status = 'Open'");
+    $stats['open_tickets'] = $stmt->fetch()['count'];
+    
+    // Tickets en cours
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM tickets WHERE status = 'In Progress'");
+    $stats['in_progress_tickets'] = $stmt->fetch()['count'];
+    
+    // Tickets fermés
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM tickets WHERE status = 'Closed'");
+    $stats['closed_tickets'] = $stmt->fetch()['count'];
+    
+    return $stats;
 }
 
 // Fonction pour obtenir tous les tickets avec détails
