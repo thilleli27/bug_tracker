@@ -88,7 +88,7 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $isEdit ? 'Modifier' : 'Nouveau'; ?> Ticket - BugTracker</title>
+    <title><?php echo $isEdit ? 'Modify' : 'New'; ?> Ticket - BugTracker</title>
     <link rel="stylesheet" href="style/new_ticket.css">
 </head>
 <body>
@@ -120,10 +120,10 @@ if (isset($_GET['logout'])) {
         <main class="main-content">
             <div class="page-header">
                 <h1 class="page-title">
-                    <?php echo $isEdit ? '✏️ Modifier le Ticket' : '➕ Nouveau Ticket'; ?>
+                    <?php echo $isEdit ? '✏️ Modify the Ticket' : '➕ New Ticket'; ?>
                 </h1>
                 <p class="page-subtitle">
-                    <?php echo $isEdit ? 'Modifiez les informations du ticket' : 'Remplissez les informations pour créer un nouveau ticket'; ?>
+                    <?php echo $isEdit ? 'Edit the ticket information' : 'Fill in the information to create a new ticket'; ?>
                 </p>
             </div>
             
@@ -142,12 +142,12 @@ if (isset($_GET['logout'])) {
                     <div class="form-grid">
                         <!-- Titre -->
                         <div class="form-group full-width">
-                            <label for="title">Titre du Ticket *</label>
+                            <label for="title">Name of the  Ticket *</label>
                             <input 
                                 type="text" 
                                 id="title" 
                                 name="title" 
-                                placeholder="Ex: Bouton de connexion ne répond pas"
+                                placeholder="Example: Login button not responding"
                                 value="<?php echo htmlspecialchars($isEdit ? $ticket['title'] : ($_POST['title'] ?? '')); ?>"
                                 required
                             >
@@ -159,16 +159,16 @@ if (isset($_GET['logout'])) {
                             <textarea 
                                 id="description" 
                                 name="description" 
-                                placeholder="Décrivez le bug en détail..."
+                                placeholder="Describe the bug in  detail..."
                             ><?php echo htmlspecialchars($isEdit ? $ticket['description'] : ($_POST['description'] ?? '')); ?></textarea>
                         </div>
                         
                         <!-- Row 1: Catégorie et Priorité -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="category_id">Catégorie *</label>
+                                <label for="category_id">Category *</label>
                                 <select id="category_id" name="category_id" required>
-                                    <option value="">Sélectionner une catégorie</option>
+                                    <option value="">Select a category</option>
                                     <?php foreach ($categories as $cat): ?>
                                         <option value="<?php echo $cat['id']; ?>"
                                             <?php echo ($isEdit && $ticket['category_id'] == $cat['id']) || (!$isEdit && ($_POST['category_id'] ?? '') == $cat['id']) ? 'selected' : ''; ?>>
@@ -179,12 +179,12 @@ if (isset($_GET['logout'])) {
                             </div>
                             
                             <div class="form-group">
-                                <label for="priority">Priorité *</label>
+                                <label for="priority">Priority *</label>
                                 <select id="priority" name="priority" required>
-                                    <option value="">Sélectionner une priorité</option>
+                                    <option value="">Select a priority</option>
                                     <?php 
                                     $priorities = ['Low', 'Medium', 'High', 'Critical'];
-                                    $priorityLabels = ['Low' => 'Basse', 'Medium' => 'Moyenne', 'High' => 'Haute', 'Critical' => 'Critique'];
+                                    $priorityLabels = ['Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High', 'Critical' => 'Critical'];
                                     foreach ($priorities as $p): 
                                     ?>
                                         <option value="<?php echo $p; ?>"
@@ -199,10 +199,10 @@ if (isset($_GET['logout'])) {
                         <!-- Row 2: Statut et Assigné à -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="status">Statut</label>
+                                <label for="status">Status</label>
                                 <select id="status" name="status">
                                     <?php 
-                                    $statuses = ['Open' => 'Ouvert', 'In Progress' => 'En cours', 'Closed' => 'Fermé'];
+                                    $statuses = ['Open' => 'Open', 'In Progress' => 'In Progress', 'Closed' => 'Closed'];
                                     foreach ($statuses as $value => $label): 
                                     ?>
                                         <option value="<?php echo $value; ?>"
@@ -214,9 +214,9 @@ if (isset($_GET['logout'])) {
                             </div>
                             
                             <div class="form-group">
-                                <label for="assigned_to">Assigné à</label>
+                                <label for="assigned_to">Assigned to</label>
                                 <select id="assigned_to" name="assigned_to">
-                                    <option value="">Non assigné</option>
+                                    <option value="">Unassigned</option>
                                     <?php foreach ($users as $user): ?>
                                         <option value="<?php echo $user['id']; ?>"
                                             <?php echo ($isEdit && $ticket['assigned_to'] == $user['id']) || (!$isEdit && ($_POST['assigned_to'] ?? '') == $user['id']) ? 'selected' : ''; ?>>
@@ -230,10 +230,10 @@ if (isset($_GET['logout'])) {
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
-                            💾 <?php echo $isEdit ? 'Mettre à jour' : 'Sauvegarder'; ?>
+                            💾 <?php echo $isEdit ? 'Update' : 'Save'; ?>
                         </button>
                         <a href="dashboard.php" class="btn btn-secondary">
-                            ❌ Annuler
+                            ❌ Cancel
                         </a>
                     </div>
                 </form>

@@ -80,22 +80,3 @@ INSERT INTO tickets (title, description, category_id, status, priority, created_
 ('Server disk space at 95%', 'Need to clean up old log files or expand storage', 3, 'In Progress', 'Critical', 1, 1, NULL),
 ('Dark mode toggle not persisting', 'User preference for dark mode resets on page refresh', 1, 'Closed', 'Low', 1, 1, '2024-12-22 09:15:00');
 
--- ============================================
--- Useful queries for the application
--- ============================================
-
--- Get all tickets with user and category information
--- SELECT t.*, u.name as creator_name, a.name as assigned_name, c.name as category_name
--- FROM tickets t
--- JOIN users u ON t.created_by = u.id
--- LEFT JOIN users a ON t.assigned_to = a.id
--- JOIN categories c ON t.category_id = c.id
--- ORDER BY t.created_at DESC;
-
--- Get ticket statistics
--- SELECT 
---     COUNT(*) as total_tickets,
---     SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) as open_tickets,
---     SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress_tickets,
---     SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed_tickets
--- FROM tickets;
