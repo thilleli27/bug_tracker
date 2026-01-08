@@ -1,0 +1,266 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #333333;
+            min-height: 100vh;
+            color: #FCFAF9;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #2a2a2a;
+            border-right: 3px solid rgba(72, 229, 194, 0.3);
+            padding: 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #48E5C2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #333333;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FCFAF9;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #a0a0a0;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(72, 229, 194, 0.1);
+            color: #48E5C2;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #FCFAF9;
+        }
+        
+        .page-subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+        
+        /* Form Card */
+        .form-card {
+            background: #2a2a2a;
+            border: 2px solid rgba(72, 229, 194, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(72, 229, 194, 0.15);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .alert-error {
+            background: rgba(245, 101, 101, 0.15);
+            border: 1px solid #f56565;
+            color: #fc8181;
+        }
+        
+        .alert ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .alert li {
+            margin: 0.25rem 0;
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            color: #48E5C2;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input, select, textarea {
+            padding: 1rem;
+            background: #333333;
+            border: 2px solid rgba(72, 229, 194, 0.2);
+            border-radius: 10px;
+            color: #FCFAF9;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #48E5C2;
+            background: #3a3a3a;
+            box-shadow: 0 0 0 3px rgba(72, 229, 194, 0.1);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        select {
+            cursor: pointer;
+        }
+        
+        select option {
+            background: #333333;
+            color: #FCFAF9;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #666;
+        }
+        
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 1.25rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #48E5C2;
+            color: #333333;
+            flex: 1;
+            box-shadow: 0 4px 15px rgba(72, 229, 194, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #3dd4b3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 229, 194, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #a0a0a0;
+            border: 2px solid rgba(160, 160, 160, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(160, 160, 160, 0.1);
+            color: #FCFAF9;
+            border-color: rgba(160, 160, 160, 0.5);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 3px solid rgba(72, 229, 194, 0.3);
+            }
+            
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .form-card {
+                padding: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
