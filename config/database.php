@@ -1,149 +1,128 @@
 <?php
-/**
- * Database Configuration
- * 
- * @project BugTracker by GoodStufForDev
- * @description Database connection and helper functions
- */
 
-// Start session for user authentication
-session_start();
 
-// Database configuration constants
+// Configuration de la base de données
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'bug_tracker');
+define('DB_NAME', 'bugtracker');
 define('DB_USER', 'root');
-define('DB_PASS', 'root');
+define('DB_PASS', '');
 
-/**
- * PDO Database Connection
- */
-try {
-    $pdo = new PDO(
-        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
-        DB_USER,
-        DB_PASS,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false
-        ]
-    );
-} catch (PDOException $e) {
-    error_log("Database connection failed: " . $e->getMessage());
-    die("Connection error. Please check your database configuration.");
+// Fonction pour obtenir une connexion PDO
+function getDBConnection() {
+    try {
+        $pdo = new PDO(
+            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+            DB_USER,
+            DB_PASS,
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false
+            ]
+        );
+        return $pdo;
+    } catch (PDOException $e) {
+        die("Erreur de connexion à la base de données : " . $e->getMessage());
+    }
 }
 
-/**
- * Check if user is logged in
- * @return bool
- */
+// Fonction pour vérifier si l'utilisateur est connecté
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-/**
- * Redirect to another page
- * @param string $page Target page
- */
-function redirect($page) {
-    header("Location: $page");
-    exit();
-}
-
-/**
- * Set flash message in session
- * @param string $message Message content
- * @param string $type Message type (success|error)
- */
-function flashMessage($message, $type = 'success') {
-    $_SESSION['flash_message'] = $message;
-    $_SESSION['flash_type'] = $type;
-}
-
-/**
- * Display and clear flash message
- */
-function displayFlash() {
-    if (isset($_SESSION['flash_message'])) {
-        $type = $_SESSION['flash_type'] ?? 'success';
-        $class = $type === 'success' ? 'success' : 'error';
-        echo "<div class='alert alert-{$class}'>{$_SESSION['flash_message']}</div>";
-        unset($_SESSION['flash_message'], $_SESSION['flash_type']);
+// Fonction pour rediriger vers la page de connexion
+function requireLogin() {
+    if (!isLoggedIn()) {
+        header('Location: login.php');
+        exit;
     }
 }
 
-/**
- * Get priority label from numeric value
- * @param int $priority Priority value (0, 1, 2)
- * @return string Priority label
- */
-function getPriorityLabel($priority) {
-    $labels = [
-        0 => 'Low',
-        1 => 'Standard',
-        2 => 'High'
+// Fonction pour obtenir l'utilisateur actuel
+function getCurrentUser() {
+    if (!isLoggedIn()) {
+        return null;
+    }
+    
+    return [
+        'id' => $_SESSION['user_id'],
+        'email' => $_SESSION['user_email'],
+        'name' => $_SESSION['user_name']
     ];
-    return $labels[$priority] ?? 'Standard';
 }
 
-/**
- * Get status label from numeric value
- * @param int $status Status value (0, 1, 2)
- * @return string Status label
- */
-function getStatusLabel($status) {
-    $labels = [
-        0 => 'Open',
-        1 => 'In Progress',
-        2 => 'Closed'
-    ];
-    return $labels[$status] ?? 'Open';
+// Fonction pour se déconnecter
+function logout() {
+    session_destroy();
+    header('Location: login.php');
+    exit;
 }
 
-/**
- * Get CSS class for priority badge
- * @param int $priority Priority value
- * @return string CSS class name
- */
-function getPriorityClass($priority) {
-    $classes = [
-        0 => 'low',
-        1 => 'standard',
-        2 => 'high'
-    ];
-    return $classes[$priority] ?? 'standard';
+// Fonction pour obtenir les statistiques des tickets
+function getTicketStats($pdo) {
+    $stmt = $pdo->query("
+        SELECT 
+            COUNT(*) as total_tickets,
+            SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) as open_tickets,
+            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress_tickets,
+            SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed_tickets,
+            SUM(CASE WHEN priority = 'Critical' THEN 1 ELSE 0 END) as critical_tickets
+        FROM tickets
+    ");
+    return $stmt->fetch();
 }
 
-/**
- * Get CSS class for status badge
- * @param int $status Status value
- * @return string CSS class name
- */
-function getStatusClass($status) {
-    $classes = [
-        0 => 'open',
-        1 => 'progress',
-        2 => 'closed'
-    ];
-    return $classes[$status] ?? 'open';
+// Fonction pour obtenir tous les tickets avec détails
+function getAllTickets($pdo, $limit = null) {
+    $sql = "
+        SELECT 
+            t.*, 
+            u.name as creator_name, 
+            a.name as assigned_name, 
+            c.name as category_name
+        FROM tickets t
+        JOIN users u ON t.created_by = u.id
+        LEFT JOIN users a ON t.assigned_to = a.id
+        JOIN categories c ON t.category_id = c.id
+        ORDER BY t.created_at DESC
+    ";
+    
+    if ($limit) {
+        $sql .= " LIMIT " . intval($limit);
+    }
+    
+    $stmt = $pdo->query($sql);
+    return $stmt->fetchAll();
 }
 
-/**
- * Sanitize user input
- * @param string $data Input data
- * @return string Sanitized data
- */
-function sanitize($data) {
-    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
+// Fonction pour obtenir un ticket par ID
+function getTicketById($pdo, $id) {
+    $stmt = $pdo->prepare("
+        SELECT 
+            t.*, 
+            u.name as creator_name, 
+            a.name as assigned_name, 
+            c.name as category_name
+        FROM tickets t
+        JOIN users u ON t.created_by = u.id
+        LEFT JOIN users a ON t.assigned_to = a.id
+        JOIN categories c ON t.category_id = c.id
+        WHERE t.id = ?
+    ");
+    $stmt->execute([$id]);
+    return $stmt->fetch();
 }
 
-/**
- * Validate email format
- * @param string $email Email address
- * @return bool
- */
-function isValidEmail($email) {
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+// Fonction pour obtenir toutes les catégories
+function getAllCategories($pdo) {
+    $stmt = $pdo->query("SELECT * FROM categories ORDER BY name");
+    return $stmt->fetchAll();
+}
+
+// Fonction pour obtenir tous les utilisateurs
+function getAllUsers($pdo) {
+    $stmt = $pdo->query("SELECT id, name, email FROM users ORDER BY name");
+    return $stmt->fetchAll();
 }
 ?>
